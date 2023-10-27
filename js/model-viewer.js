@@ -11,7 +11,7 @@ AFRAME.registerComponent('model-viewer', {
         }
     },
     init: function() {
-        var el = this.el;
+        let el = this.el;
         el.setAttribute('renderer', {
             colorManagement: true
         });
@@ -66,12 +66,9 @@ AFRAME.registerComponent('model-viewer', {
         this.modelEl.addEventListener('model-loaded', this.onModelLoaded);
     },
     initUploadInput: function() {
-        var uploadContainerEl = this.uploadContainerEl = document.createElement('div');
-        var inputEl = this.inputEl = document.createElement('input');
-        var submitButtonEl = this.submitButtonEl = document.createElement('button');
-        var style = document.createElement('style');
-        var css = '.a-upload-model  {box-sizing: border-box; display: inline-block; height: 34px; padding: 0; width: 70%;' + 'bottom: 20px; left: 15%; right: 15%; position: absolute; color: white;' + 'font-size: 12px; line-height: 12px; border: none;' + 'border-radius: 5px}' + '.a-upload-model.hidden {display: none}' + '.a-upload-model-button {cursor: pointer; padding: 0px 2px 0 2px; font-weight: bold; color: #666; border: 3px solid #666; box-sizing: border-box; vertical-align: middle; width: 25%; max-width: 110px; border-radius: 10px; height: 34px; background-color: white; margin: 0;}' + '.a-upload-model-button:hover {border-color: #ef2d5e; color: #ef2d5e}' + '.a-upload-model-input {color: #666; vertical-align: middle; padding: 0px 10px 0 10px; text-transform: uppercase; border: 0; width: 75%; height: 100%; border-radius: 10px; margin-right: 10px}' + '@media only screen and (max-width: 800px) {' + '.a-upload-model {margin: auto;}' + '.a-upload-model-input {width: 70%;}}' + '@media only screen and (max-width: 700px) {' + '.a-upload-model {display: none}}';
-        var inputDefaultValue = this.inputDefaultValue = 'Copy URL to glTF or glb model';
+        let uploadContainerEl = this.uploadContainerEl = document.createElement('div');
+        let style = document.createElement('style');
+        let css = '.a-upload-model  {box-sizing: border-box; display: inline-block; height: 34px; padding: 0; width: 70%;' + 'bottom: 20px; left: 15%; right: 15%; position: absolute; color: white;' + 'font-size: 12px; line-height: 12px; border: none;' + 'border-radius: 5px}' + '.a-upload-model.hidden {display: none}' + '.a-upload-model-button {cursor: pointer; padding: 0px 2px 0 2px; font-weight: bold; color: #666; border: 3px solid #666; box-sizing: border-box; vertical-align: middle; width: 25%; max-width: 110px; border-radius: 10px; height: 34px; background-color: white; margin: 0;}' + '.a-upload-model-button:hover {border-color: #ef2d5e; color: #ef2d5e}' + '.a-upload-model-input {color: #666; vertical-align: middle; padding: 0px 10px 0 10px; text-transform: uppercase; border: 0; width: 75%; height: 100%; border-radius: 10px; margin-right: 10px}' + '@media only screen and (max-width: 800px) {' + '.a-upload-model {margin: auto;}' + '.a-upload-model-input {width: 70%;}}' + '@media only screen and (max-width: 700px) {' + '.a-upload-model {display: none}}';
         if (AFRAME.utils.device.checkARSupport()) {
             css += '@media only screen and (max-width: 800px) {' + '.a-upload-model-input {width: 60%;}}';
         }
@@ -82,33 +79,6 @@ AFRAME.registerComponent('model-viewer', {
             style.appendChild(document.createTextNode(css));
         }
         document.getElementsByTagName('head')[0].appendChild(style);
-        submitButtonEl.classList.add('a-upload-model-button');
-        submitButtonEl.innerHTML = 'OPEN MODEL';
-        submitButtonEl.addEventListener('click', this.submitURLButtonClicked);
-        inputEl.classList.add('a-upload-model-input');
-        inputEl.onfocus = function() {
-            if (this.value !== inputDefaultValue) {
-                return;
-            }
-            this.value = '';
-        }
-        ;
-        inputEl.onblur = function() {
-            if (this.value) {
-                return;
-            }
-            this.value = inputDefaultValue;
-        }
-        ;
-        this.el.sceneEl.addEventListener('infomessageopened', function() {
-            uploadContainerEl.classList.add('hidden');
-        });
-        this.el.sceneEl.addEventListener('infomessageclosed', function() {
-            uploadContainerEl.classList.remove('hidden');
-        });
-        inputEl.value = inputDefaultValue;
-        uploadContainerEl.appendChild(inputEl);
-        uploadContainerEl.appendChild(submitButtonEl);
         this.el.sceneEl.appendChild(uploadContainerEl);
     },
     update: function() {
@@ -122,17 +92,17 @@ AFRAME.registerComponent('model-viewer', {
         this.modelEl.setAttribute('gltf-model', this.data.gltfModel);
     },
     submitURLButtonClicked: function(evt) {
-        var modelURL = this.inputEl.value;
+        let modelURL = this.inputEl.value;
         if (modelURL === this.inputDefaultValue) {
             return;
         }
         this.el.setAttribute('model-viewer', 'gltfModel', modelURL);
     },
     initCameraRig: function() {
-        var cameraRigEl = this.cameraRigEl = document.createElement('a-entity');
-        var cameraEl = this.cameraEl = document.createElement('a-entity');
-        var rightHandEl = this.rightHandEl = document.createElement('a-entity');
-        var leftHandEl = this.leftHandEl = document.createElement('a-entity');
+        let cameraRigEl = this.cameraRigEl = document.createElement('a-entity');
+        let cameraEl = this.cameraEl = document.createElement('a-entity');
+        let rightHandEl = this.rightHandEl = document.createElement('a-entity');
+        let leftHandEl = this.leftHandEl = document.createElement('a-entity');
         cameraEl.setAttribute('camera', {
             fov: 60
         });
@@ -167,7 +137,7 @@ AFRAME.registerComponent('model-viewer', {
         this.el.appendChild(cameraRigEl);
     },
     initBackground: function() {
-        var backgroundEl = this.backgroundEl = document.querySelector('a-entity');
+        let backgroundEl = this.backgroundEl = document.querySelector('a-entity');
         backgroundEl.setAttribute('geometry', {
             primitive: 'sphere',
             radius: 65
@@ -181,15 +151,15 @@ AFRAME.registerComponent('model-viewer', {
         backgroundEl.setAttribute('hide-on-enter-ar', '');
     },
     initEntities: function() {
-        var containerEl = this.containerEl = document.createElement('a-entity');
-        var laserHitPanelEl = this.laserHitPanelEl = document.createElement('a-entity');
-        var modelPivotEl = this.modelPivotEl = document.createElement('a-entity');
-        var modelEl = this.modelEl = document.createElement('a-entity');
-        var shadowEl = this.shadowEl = document.createElement('a-entity');
-        var arShadowEl = this.arShadowEl = document.createElement('a-entity');
-        var titleEl = this.titleEl = document.createElement('a-entity');
-        var lightEl = this.lightEl = document.createElement('a-entity');
-        var sceneLightEl = this.sceneLightEl = document.createElement('a-entity');
+        let containerEl = this.containerEl = document.createElement('a-entity');
+        let laserHitPanelEl = this.laserHitPanelEl = document.createElement('a-entity');
+        let modelPivotEl = this.modelPivotEl = document.createElement('a-entity');
+        let modelEl = this.modelEl = document.createElement('a-entity');
+        let shadowEl = this.shadowEl = document.createElement('a-entity');
+        let arShadowEl = this.arShadowEl = document.createElement('a-entity');
+        let titleEl = this.titleEl = document.createElement('a-entity');
+        let lightEl = this.lightEl = document.createElement('a-entity');
+        let sceneLightEl = this.sceneLightEl = document.createElement('a-entity');
         sceneLightEl.setAttribute('light', {
             type: 'hemisphere',
             intensity: 1
@@ -250,24 +220,24 @@ AFRAME.registerComponent('model-viewer', {
         this.el.appendChild(containerEl);
     },
     onThumbstickMoved: function(evt) {
-        var modelPivotEl = this.modelPivotEl;
-        var modelScale = this.modelScale || modelPivotEl.object3D.scale.x;
+        let modelPivotEl = this.modelPivotEl;
+        let modelScale = this.modelScale || modelPivotEl.object3D.scale.x;
         modelScale -= evt.detail.y / 20;
         modelScale = Math.min(Math.max(0.8, modelScale), 2.0);
         modelPivotEl.object3D.scale.set(modelScale, modelScale, modelScale);
         this.modelScale = modelScale;
     },
     onMouseWheel: function(evt) {
-        var modelPivotEl = this.modelPivotEl;
-        var modelScale = this.modelScale || modelPivotEl.object3D.scale.x;
+        let modelPivotEl = this.modelPivotEl;
+        let modelScale = this.modelScale || modelPivotEl.object3D.scale.x;
         modelScale -= evt.deltaY / 100;
         modelScale = Math.min(Math.max(0.8, modelScale), 2.0);
         modelPivotEl.object3D.scale.set(modelScale, modelScale, modelScale);
         this.modelScale = modelScale;
     },
     onMouseDownLaserHitPanel: function(evt) {
-        var cursorEl = evt.detail.cursorEl;
-        var intersection = cursorEl.components.raycaster.getIntersection(this.laserHitPanelEl);
+        let cursorEl = evt.detail.cursorEl;
+        let intersection = cursorEl.components.raycaster.getIntersection(this.laserHitPanelEl);
         if (!intersection) {
             return;
         }
@@ -277,7 +247,7 @@ AFRAME.registerComponent('model-viewer', {
         this.oldHandY = undefined;
     },
     onMouseUpLaserHitPanel: function(evt) {
-        var cursorEl = evt.detail.cursorEl;
+        let cursorEl = evt.detail.cursorEl;
         if (cursorEl === this.leftHandEl) {
             this.leftHandPressed = false;
         }
@@ -297,11 +267,11 @@ AFRAME.registerComponent('model-viewer', {
         }
     },
     tick: function() {
-        var modelPivotEl = this.modelPivotEl;
-        var intersection;
-        var intersectionPosition;
-        var laserHitPanelEl = this.laserHitPanelEl;
-        var activeHandEl = this.activeHandEl;
+        let modelPivotEl = this.modelPivotEl;
+        let intersection;
+        let intersectionPosition;
+        let laserHitPanelEl = this.laserHitPanelEl;
+        let activeHandEl = this.activeHandEl;
         if (!this.el.sceneEl.is('vr-mode')) {
             return;
         }
@@ -323,7 +293,7 @@ AFRAME.registerComponent('model-viewer', {
         this.oldHandY = intersectionPosition.y;
     },
     onEnterVR: function() {
-        var cameraRigEl = this.cameraRigEl;
+        let cameraRigEl = this.cameraRigEl;
         this.cameraRigPosition = cameraRigEl.object3D.position.clone();
         this.cameraRigRotation = cameraRigEl.object3D.rotation.clone();
         if (!this.el.sceneEl.is('ar-mode')) {
@@ -333,7 +303,7 @@ AFRAME.registerComponent('model-viewer', {
         }
     },
     onExitVR: function() {
-        var cameraRigEl = this.cameraRigEl;
+        let cameraRigEl = this.cameraRigEl;
         cameraRigEl.object3D.position.copy(this.cameraRigPosition);
         cameraRigEl.object3D.rotation.copy(this.cameraRigRotation);
         cameraRigEl.object3D.rotation.set(0, 0, 0);
@@ -347,9 +317,9 @@ AFRAME.registerComponent('model-viewer', {
         }
     },
     onSingleTouchMove: function(evt) {
-        var dX;
-        var dY;
-        var modelPivotEl = this.modelPivotEl;
+        let dX;
+        let dY;
+        let modelPivotEl = this.modelPivotEl;
         this.oldClientX = this.oldClientX || evt.touches[0].clientX;
         this.oldClientY = this.oldClientY || evt.touches[0].clientY;
         dX = this.oldClientX - evt.touches[0].clientX;
@@ -361,13 +331,13 @@ AFRAME.registerComponent('model-viewer', {
         this.oldClientY = evt.touches[0].clientY;
     },
     onPinchMove: function(evt) {
-        var dX = evt.touches[0].clientX - evt.touches[1].clientX;
-        var dY = evt.touches[0].clientY - evt.touches[1].clientY;
-        var modelPivotEl = this.modelPivotEl;
-        var distance = Math.sqrt(dX * dX + dY * dY);
-        var oldDistance = this.oldDistance || distance;
-        var distanceDifference = oldDistance - distance;
-        var modelScale = this.modelScale || modelPivotEl.object3D.scale.x;
+        let dX = evt.touches[0].clientX - evt.touches[1].clientX;
+        let dY = evt.touches[0].clientY - evt.touches[1].clientY;
+        let modelPivotEl = this.modelPivotEl;
+        let distance = Math.sqrt(dX * dX + dY * dY);
+        let oldDistance = this.oldDistance || distance;
+        let distanceDifference = oldDistance - distance;
+        let modelScale = this.modelScale || modelPivotEl.object3D.scale.x;
         modelScale -= distanceDifference / 500;
         modelScale = Math.min(Math.max(0.8, modelScale), 2.0);
         modelPivotEl.object3D.scale.set(modelScale, modelScale, modelScale);
@@ -397,9 +367,9 @@ AFRAME.registerComponent('model-viewer', {
         }
     },
     dragModel: function(evt) {
-        var dX;
-        var dY;
-        var modelPivotEl = this.modelPivotEl;
+        let dX;
+        let dY;
+        let modelPivotEl = this.modelPivotEl;
         if (!this.oldClientX) {
             return;
         }
@@ -411,9 +381,9 @@ AFRAME.registerComponent('model-viewer', {
         this.oldClientY = evt.clientY;
     },
     rotateModel: function(evt) {
-        var dX;
-        var dY;
-        var modelPivotEl = this.modelPivotEl;
+        let dX;
+        let dY;
+        let modelPivotEl = this.modelPivotEl;
         if (!this.oldClientX) {
             return;
         }
@@ -429,17 +399,18 @@ AFRAME.registerComponent('model-viewer', {
         this.centerAndScaleModel();
     },
     centerAndScaleModel: function() {
-        var box;
-        var size;
-        var center;
-        var scale;
-        var modelEl = this.modelEl;
-        var shadowEl = this.shadowEl;
-        var titleEl = this.titleEl;
-        var gltfObject = modelEl.getObject3D('mesh');
+        let box;
+        let size;
+        let center;
+        let scale;
+        let modelEl = this.modelEl;
+        let shadowEl = this.shadowEl;
+        let titleEl = this.titleEl;
+        let gltfObject = modelEl.getObject3D('mesh');
         modelEl.object3D.position.set(0, 0, 0);
-        modelEl.object3D.scale.set(0.7,0.7,0.7);
-        this.cameraRigEl.object3D.position.z = 3.0;
+        modelEl.object3D.scale.set(0.1,0.1,0.1);
+        modelEl.object3D.rotation.set(0, 5, 0);
+        this.cameraRigEl.object3D.position.z = 8.0;
         modelEl.object3D.updateMatrixWorld();
         box = new THREE.Box3().setFromObject(gltfObject);
         size = box.getSize(new THREE.Vector3());

@@ -1,8 +1,8 @@
-var DEFAULT_CLIP = "__auto__";
+let DEFAULT_CLIP = "__auto__";
 AFRAME.registerComponent("animation-mixer", {
   schema: { clip: { default: DEFAULT_CLIP }, duration: { default: 0 } },
   init: function () {
-    var model = this.el.getObject3D("mesh");
+    let model = this.el.getObject3D("mesh");
     this.model = null;
     this.mixer = null;
     this.activeAction = null;
@@ -29,7 +29,7 @@ AFRAME.registerComponent("animation-mixer", {
   },
   update: function (previousData) {
     if (!previousData) return;
-    var data = this.data;
+    let data = this.data;
     if (data.clip !== previousData.clip) {
       if (this.activeAction) this.activeAction.stop();
       if (data.clip) this.playClip(data.clip);
@@ -41,10 +41,10 @@ AFRAME.registerComponent("animation-mixer", {
   },
   playClip: function (clipName) {
     if (!this.mixer) return;
-    var clip;
-    var data = this.data;
-    var model = this.model;
-    var animations =
+    let clip;
+    let data = this.data;
+    let model = this.model;
+    let animations =
       model.animations || (model.geometry || {}).animations || [];
     if (!animations.length) {
       return;
