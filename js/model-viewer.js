@@ -391,8 +391,8 @@ AFRAME.registerComponent('model-viewer', {
         let titleEl = this.titleEl;
         let gltfObject = modelEl.getObject3D('mesh');
         modelEl.object3D.position.set(0, 0, 0);
-        modelEl.object3D.scale.set(0.1,0.1,0.1);
-        modelEl.object3D.rotation.set(0, 5, 0);
+        modelEl.object3D.scale.set(0.2,0.2,0.2);
+        modelEl.object3D.rotation.set(0, 10, 0);
         this.cameraRigEl.object3D.position.z = 8.0;
         modelEl.object3D.updateMatrixWorld();
         box = new THREE.Box3().setFromObject(gltfObject);
