@@ -1,26 +1,25 @@
 <!DOCTYPE html>
 <html>
   <head>
-  <meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-07-28" content="ArFv1ZeTwzkhjNE00uAE+XtiQB41fwqG/TqlFMLrepd9sforQSvQE/tgfIbUMYNuNre4QR1k4/z8xp2mV3dbhwwAAABeeyJvcmlnaW4iOiJodHRwczovL2FmcmFtZS5pbzo0NDMiLCJmZWF0dXJlIjoiV2ViVlIxLjEiLCJleHBpcnkiOjE1MDEyMTcwMDIsImlzU3ViZG9tYWluIjp0cnVlfQ==">
-  <meta charset="utf-8">
-  <title>Model Viewer AR - VR</title>
-  <meta name="description" content="Model Viewer (VR / AR) • A-Frame">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <script src="./js/aframe-master.min.js"></script>
-  <script src="./js/info-message.js"></script>
-  <script src="./js/animation-mixer.js"></script>
-  <script src="./js/ar-shadows.js"></script>
-  <script src="./js/model-viewer.js"></script>
-  <script src="./js/background-gradient.js"></script>
+    <meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-07-28" content="ArFv1ZeTwzkhjNE00uAE+XtiQB41fwqG/TqlFMLrepd9sforQSvQE/tgfIbUMYNuNre4QR1k4/z8xp2mV3dbhwwAAABeeyJvcmlnaW4iOiJodHRwczovL2FmcmFtZS5pbzo0NDMiLCJmZWF0dXJlIjoiV2ViVlIxLjEiLCJleHBpcnkiOjE1MDEyMTcwMDIsImlzU3ViZG9tYWluIjp0cnVlfQ==">
+    <meta charset="utf-8">
+    <title>Model Viewer AR - VR</title>
+    <meta name="description" content="Model Viewer (VR / AR) • A-Frame">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script> 
+    <script src="./js/info-message.js"></script>
+    <script src="./js/animation-mixer.js"></script>
+    <script src="./js/ar-shadows.js"></script>
+    <script src="./js/model-viewer.js"></script>
+    <script src="./js/background-gradient.js"></script>
   </head>
   <body>
     <a-scene renderer="colorManagement: true;" model-viewer="gltfModel: #triceratops;">
-      <a-assets timeout="10000">
+      <a-assets timeout="20000">
         <a-asset-item id="triceratops" src="./models/scene.gltf" response-type="arraybuffer" crossorigin="anonymous">
         </a-asset-item>
         <img id="shadow" src="./images/shadow.png"></img>
-        <a-asset-item id="messageText" src="message.html"></a-asset-item>
       </a-assets>
     </a-scene>
   </body>
-  </html>
+</html>

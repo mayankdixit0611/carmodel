@@ -5,10 +5,8 @@ AFRAME.registerComponent('model-viewer', {
         },
         title: {
             default: ''
-        },
-        uploadUIEnabled: {
-            default: true
         }
+        
     },
     init: function() {
         let el = this.el;
@@ -33,7 +31,7 @@ AFRAME.registerComponent('model-viewer', {
         this.onMouseWheel = this.onMouseWheel.bind(this);
         this.onTouchMove = this.onTouchMove.bind(this);
         this.onTouchEnd = this.onTouchEnd.bind(this);
-        this.submitURLButtonClicked = this.submitURLButtonClicked.bind(this);
+        // this.submitURLButtonClicked = this.submitURLButtonClicked.bind(this);
         this.onThumbstickMoved = this.onThumbstickMoved.bind(this);
         this.onEnterVR = this.onEnterVR.bind(this);
         this.onExitVR = this.onExitVR.bind(this);
@@ -43,9 +41,9 @@ AFRAME.registerComponent('model-viewer', {
         this.initCameraRig();
         this.initEntities();
         this.initBackground();
-        if (this.data.uploadUIEnabled) {
-            this.initUploadInput();
-        }
+        // if (this.data.uploadUIEnabled) {
+        //     // this.initUploadInput();
+        // }
         this.el.sceneEl.canvas.oncontextmenu = function(evt) {
             evt.preventDefault();
         }
@@ -65,22 +63,7 @@ AFRAME.registerComponent('model-viewer', {
         this.el.sceneEl.addEventListener('exit-vr', this.onExitVR);
         this.modelEl.addEventListener('model-loaded', this.onModelLoaded);
     },
-    initUploadInput: function() {
-        let uploadContainerEl = this.uploadContainerEl = document.createElement('div');
-        let style = document.createElement('style');
-        let css = '.a-upload-model  {box-sizing: border-box; display: inline-block; height: 34px; padding: 0; width: 70%;' + 'bottom: 20px; left: 15%; right: 15%; position: absolute; color: white;' + 'font-size: 12px; line-height: 12px; border: none;' + 'border-radius: 5px}' + '.a-upload-model.hidden {display: none}' + '.a-upload-model-button {cursor: pointer; padding: 0px 2px 0 2px; font-weight: bold; color: #666; border: 3px solid #666; box-sizing: border-box; vertical-align: middle; width: 25%; max-width: 110px; border-radius: 10px; height: 34px; background-color: white; margin: 0;}' + '.a-upload-model-button:hover {border-color: #ef2d5e; color: #ef2d5e}' + '.a-upload-model-input {color: #666; vertical-align: middle; padding: 0px 10px 0 10px; text-transform: uppercase; border: 0; width: 75%; height: 100%; border-radius: 10px; margin-right: 10px}' + '@media only screen and (max-width: 800px) {' + '.a-upload-model {margin: auto;}' + '.a-upload-model-input {width: 70%;}}' + '@media only screen and (max-width: 700px) {' + '.a-upload-model {display: none}}';
-        if (AFRAME.utils.device.checkARSupport()) {
-            css += '@media only screen and (max-width: 800px) {' + '.a-upload-model-input {width: 60%;}}';
-        }
-        uploadContainerEl.classList.add('a-upload-model');
-        if (style.styleSheet) {
-            style.styleSheet.cssText = css;
-        } else {
-            style.appendChild(document.createTextNode(css));
-        }
-        document.getElementsByTagName('head')[0].appendChild(style);
-        this.el.sceneEl.appendChild(uploadContainerEl);
-    },
+    
     update: function() {
         if (!this.data.gltfModel) {
             return;
@@ -91,13 +74,13 @@ AFRAME.registerComponent('model-viewer', {
         });
         this.modelEl.setAttribute('gltf-model', this.data.gltfModel);
     },
-    submitURLButtonClicked: function(evt) {
-        let modelURL = this.inputEl.value;
-        if (modelURL === this.inputDefaultValue) {
-            return;
-        }
-        this.el.setAttribute('model-viewer', 'gltfModel', modelURL);
-    },
+    // submitURLButtonClicked: function(evt) {
+    //     let modelURL = this.inputEl.value;submitURLButtonClicked
+    //     if (modelURL === this.inputDefaultValue) {
+    //         return;
+    //     }
+    //     this.el.setAttribute('model-viewer', 'gltfModel', modelURL);
+    // },
     initCameraRig: function() {
         let cameraRigEl = this.cameraRigEl = document.createElement('a-entity');
         let cameraEl = this.cameraEl = document.createElement('a-entity');
