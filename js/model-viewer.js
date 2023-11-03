@@ -25,7 +25,7 @@ AFRAME.registerComponent('model-viewer', {
         });
         el.setAttribute('background', '');
         this.modelEl = this.el.querySelector('#modelEl');
-        this.modelInteractable = false; 
+        this.modelInteractable = false;
         this.activeHandEl = null;
         this.onModelLoaded = this.onModelLoaded.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
@@ -60,25 +60,30 @@ AFRAME.registerComponent('model-viewer', {
         document.addEventListener('touchmove', this.onTouchMove);
         this.el.sceneEl.addEventListener('enter-vr', this.onEnterVR);
         this.el.sceneEl.addEventListener('exit-vr', this.onExitVR);
+        // this.modelEl.addEventListener('click', this.onModelClick);
         this.modelEl.addEventListener('model-loaded', this.onModelLoaded);
-        
+        this.containerEl.addEventListener('click', this.onModelClick);
+
     },
 
     onModelClick: function (evt) {
-        console.log('gggggggthis')
-        if (this.activeHandEl) {
-            const clickedObject = evt.detail.intersection.object;
-            console.log('gggg',clickedObject)
-            if (clickedObject) {
-                const doorName = clickedObject.userData.name;
-
-                if (doorName === 'SM_front_door.001') {
-                    clickedObject.rotation.set(0, -1, 0);
-                } else if (doorName === 'SM_front_door.002') {
-                } else if (doorName === 'SM_BAck_dooor.001') {
-                } else if (doorName === 'SM_BAck_dooor.002') {
-                }
+        console.log('gggggggthis');
+        const raycasterEl = document.querySelector('[raycaster]');
+        const intersections = raycasterEl.components.raycaster.intersections;
+        if (intersections.length > 0) {
+            const modelEl = document.querySelector('#modelEl');
+            const doorName1 = 'PU_Rear_Door';
+            const doorMesh = modelEl.getObject3D('mesh').children.find(mesh =>
+                mesh.userData.name === doorName1
+            );
+            if (doorMesh) {
+                doorMesh.rotation.set(0, 1, 0);
             }
+
+            // if (clickedObject.getAttribute('class') === 'clickable') {
+            //     const clickedMeshId = clickedObject.getAttribute('mesh-id');
+            //     console.log('Clicked Mesh ID: ' + clickedMeshId);
+            // }
         }
     },
 
@@ -402,27 +407,27 @@ AFRAME.registerComponent('model-viewer', {
         //     }
         // });
 
-        const doorName1 = 'SM_front_door.001';
-        const doorName2 = 'SM_front_door.002';
-        const doorName3 = 'SM_BAck_dooor.001';
-        const doorName4 = 'SM_BAck_dooor.002';
+        // const doorName1 = 'SM_front_door.001';
+        // const doorName2 = 'SM_front_door.002';
+        // const doorName3 = 'SM_BAck_dooor.001';
+        // const doorName4 = 'SM_BAck_dooor.002';
 
-        
 
-        const doorMesh = this.findDoorMesh(doorName1);
 
-        if (doorMesh) {
-            doorMesh.rotation.set(0, -1, 0);
-           
-        }
+        // const doorMesh = this.findDoorMesh(doorName1);
+
+        // if (doorMesh) {
+        //     debugger;
+        //     doorMesh.rotation.set(0, -1, 0);
+        // }
     },
-    findDoorMesh: function ( doorName) {
-        const modelEl = this.modelEl;       
+    findDoorMesh: function (doorName) {
+        const modelEl = this.modelEl;
 
-        const isFound = modelEl.getObject3D('mesh').children.find(mesh => 
-             mesh.userData.name === doorName
+        const isFound = modelEl.getObject3D('mesh').children.find(mesh =>
+            mesh.userData.name === doorName
         );
-        return isFound
+        return isFound;
     },
 
     centerAndScaleModel: function () {
@@ -465,14 +470,15 @@ AFRAME.registerComponent('model-viewer', {
             this.cameraRigEl.object3D.position.z -= 1;
         }
     },
-    onMouseDown: function (evt) {              
+    onMouseDown: function (evt) {
         if (evt.buttons) {
             this.leftRightButtonPressed = evt.buttons === 3;
         }
         this.oldClientX = evt.clientX;
         this.oldClientY = evt.clientY;
 
-    }}
+    }
+}
 
 
 
