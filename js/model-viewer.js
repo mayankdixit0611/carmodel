@@ -6,9 +6,9 @@ AFRAME.registerComponent('model-viewer', {
         title: {
             default: ''
         }
-        
+
     },
-    init: function() {
+    init: function () {
         let el = this.el;
         el.setAttribute('renderer', {
             colorManagement: true
@@ -24,6 +24,9 @@ AFRAME.registerComponent('model-viewer', {
             optionalFeatures: 'hit-test, local-floor, light-estimation, anchors'
         });
         el.setAttribute('background', '');
+        this.modelEl = this.el.querySelector('#modelEl');
+        this.modelInteractable = false; 
+        this.activeHandEl = null;
         this.onModelLoaded = this.onModelLoaded.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
@@ -31,7 +34,6 @@ AFRAME.registerComponent('model-viewer', {
         this.onMouseWheel = this.onMouseWheel.bind(this);
         this.onTouchMove = this.onTouchMove.bind(this);
         this.onTouchEnd = this.onTouchEnd.bind(this);
-        // this.submitURLButtonClicked = this.submitURLButtonClicked.bind(this);
         this.onThumbstickMoved = this.onThumbstickMoved.bind(this);
         this.onEnterVR = this.onEnterVR.bind(this);
         this.onExitVR = this.onExitVR.bind(this);
@@ -41,13 +43,10 @@ AFRAME.registerComponent('model-viewer', {
         this.initCameraRig();
         this.initEntities();
         this.initBackground();
-        // if (this.data.uploadUIEnabled) {
-        //     // this.initUploadInput();
-        // }
-        this.el.sceneEl.canvas.oncontextmenu = function(evt) {
+        this.el.sceneEl.canvas.oncontextmenu = function (evt) {
             evt.preventDefault();
         }
-        ;
+            ;
         window.addEventListener('orientationchange', this.onOrientationChange);
         this.laserHitPanelEl.addEventListener('mousedown', this.onMouseDownLaserHitPanel);
         this.laserHitPanelEl.addEventListener('mouseup', this.onMouseUpLaserHitPanel);
@@ -62,9 +61,29 @@ AFRAME.registerComponent('model-viewer', {
         this.el.sceneEl.addEventListener('enter-vr', this.onEnterVR);
         this.el.sceneEl.addEventListener('exit-vr', this.onExitVR);
         this.modelEl.addEventListener('model-loaded', this.onModelLoaded);
+        
     },
-    
-    update: function() {
+
+    onModelClick: function (evt) {
+        console.log('gggggggthis')
+        if (this.activeHandEl) {
+            const clickedObject = evt.detail.intersection.object;
+            console.log('gggg',clickedObject)
+            if (clickedObject) {
+                const doorName = clickedObject.userData.name;
+
+                if (doorName === 'SM_front_door.001') {
+                    clickedObject.rotation.set(0, -1, 0);
+                } else if (doorName === 'SM_front_door.002') {
+                } else if (doorName === 'SM_BAck_dooor.001') {
+                } else if (doorName === 'SM_BAck_dooor.002') {
+                }
+            }
+        }
+    },
+
+
+    update: function () {
         if (!this.data.gltfModel) {
             return;
         }
@@ -74,14 +93,7 @@ AFRAME.registerComponent('model-viewer', {
         });
         this.modelEl.setAttribute('gltf-model', this.data.gltfModel);
     },
-    // submitURLButtonClicked: function(evt) {
-    //     let modelURL = this.inputEl.value;submitURLButtonClicked
-    //     if (modelURL === this.inputDefaultValue) {
-    //         return;
-    //     }
-    //     this.el.setAttribute('model-viewer', 'gltfModel', modelURL);
-    // },
-    initCameraRig: function() {
+    initCameraRig: function () {
         let cameraRigEl = this.cameraRigEl = document.createElement('a-entity');
         let cameraEl = this.cameraEl = document.createElement('a-entity');
         let rightHandEl = this.rightHandEl = document.createElement('a-entity');
@@ -119,7 +131,7 @@ AFRAME.registerComponent('model-viewer', {
         cameraRigEl.appendChild(leftHandEl);
         this.el.appendChild(cameraRigEl);
     },
-    initBackground: function() {
+    initBackground: function () {
         let backgroundEl = this.backgroundEl = document.querySelector('a-entity');
         backgroundEl.setAttribute('geometry', {
             primitive: 'sphere',
@@ -133,7 +145,8 @@ AFRAME.registerComponent('model-viewer', {
         });
         backgroundEl.setAttribute('hide-on-enter-ar', '');
     },
-    initEntities: function() {
+
+    initEntities: function () {
         let containerEl = this.containerEl = document.createElement('a-entity');
         let laserHitPanelEl = this.laserHitPanelEl = document.createElement('a-entity');
         let modelPivotEl = this.modelPivotEl = document.createElement('a-entity');
@@ -172,10 +185,10 @@ AFRAME.registerComponent('model-viewer', {
         arShadowEl.setAttribute('shadow', 'receive: true');
         arShadowEl.setAttribute('ar-shadows', 'opacity: 0.2');
         arShadowEl.setAttribute('visible', 'false');
-        this.el.addEventListener('ar-hit-test-select-start', function() {
+        this.el.addEventListener('ar-hit-test-select-start', function () {
             arShadowEl.object3D.visible = false;
         });
-        this.el.addEventListener('ar-hit-test-select', function() {
+        this.el.addEventListener('ar-hit-test-select', function () {
             arShadowEl.object3D.visible = true;
         });
         modelPivotEl.appendChild(arShadowEl);
@@ -202,7 +215,7 @@ AFRAME.registerComponent('model-viewer', {
         this.containerEl.appendChild(modelPivotEl);
         this.el.appendChild(containerEl);
     },
-    onThumbstickMoved: function(evt) {
+    onThumbstickMoved: function (evt) {
         let modelPivotEl = this.modelPivotEl;
         let modelScale = this.modelScale || modelPivotEl.object3D.scale.x;
         modelScale -= evt.detail.y / 20;
@@ -210,7 +223,7 @@ AFRAME.registerComponent('model-viewer', {
         modelPivotEl.object3D.scale.set(modelScale, modelScale, modelScale);
         this.modelScale = modelScale;
     },
-    onMouseWheel: function(evt) {
+    onMouseWheel: function (evt) {
         let modelPivotEl = this.modelPivotEl;
         let modelScale = this.modelScale || modelPivotEl.object3D.scale.x;
         modelScale -= evt.deltaY / 100;
@@ -218,7 +231,7 @@ AFRAME.registerComponent('model-viewer', {
         modelPivotEl.object3D.scale.set(modelScale, modelScale, modelScale);
         this.modelScale = modelScale;
     },
-    onMouseDownLaserHitPanel: function(evt) {
+    onMouseDownLaserHitPanel: function (evt) {
         let cursorEl = evt.detail.cursorEl;
         let intersection = cursorEl.components.raycaster.getIntersection(this.laserHitPanelEl);
         if (!intersection) {
@@ -229,7 +242,7 @@ AFRAME.registerComponent('model-viewer', {
         this.oldHandX = undefined;
         this.oldHandY = undefined;
     },
-    onMouseUpLaserHitPanel: function(evt) {
+    onMouseUpLaserHitPanel: function (evt) {
         let cursorEl = evt.detail.cursorEl;
         if (cursorEl === this.leftHandEl) {
             this.leftHandPressed = false;
@@ -242,14 +255,14 @@ AFRAME.registerComponent('model-viewer', {
             this.activeHandEl = undefined;
         }
     },
-    onOrientationChange: function() {
+    onOrientationChange: function () {
         if (AFRAME.utils.device.isLandscape()) {
             this.cameraRigEl.object3D.position.z -= 1;
         } else {
             this.cameraRigEl.object3D.position.z += 1;
         }
     },
-    tick: function() {
+    tick: function () {
         let modelPivotEl = this.modelPivotEl;
         let intersection;
         let intersectionPosition;
@@ -275,7 +288,7 @@ AFRAME.registerComponent('model-viewer', {
         this.oldHandX = intersectionPosition.x;
         this.oldHandY = intersectionPosition.y;
     },
-    onEnterVR: function() {
+    onEnterVR: function () {
         let cameraRigEl = this.cameraRigEl;
         this.cameraRigPosition = cameraRigEl.object3D.position.clone();
         this.cameraRigRotation = cameraRigEl.object3D.rotation.clone();
@@ -285,13 +298,13 @@ AFRAME.registerComponent('model-viewer', {
             cameraRigEl.object3D.position.set(0, 0, 0);
         }
     },
-    onExitVR: function() {
+    onExitVR: function () {
         let cameraRigEl = this.cameraRigEl;
         cameraRigEl.object3D.position.copy(this.cameraRigPosition);
         cameraRigEl.object3D.rotation.copy(this.cameraRigRotation);
         cameraRigEl.object3D.rotation.set(0, 0, 0);
     },
-    onTouchMove: function(evt) {
+    onTouchMove: function (evt) {
         if (evt.touches.length === 1) {
             this.onSingleTouchMove(evt);
         }
@@ -299,7 +312,7 @@ AFRAME.registerComponent('model-viewer', {
             this.onPinchMove(evt);
         }
     },
-    onSingleTouchMove: function(evt) {
+    onSingleTouchMove: function (evt) {
         let dX;
         let dY;
         let modelPivotEl = this.modelPivotEl;
@@ -313,7 +326,7 @@ AFRAME.registerComponent('model-viewer', {
         modelPivotEl.object3D.rotation.x = Math.min(Math.max(-Math.PI / 2, modelPivotEl.object3D.rotation.x), Math.PI / 2);
         this.oldClientY = evt.touches[0].clientY;
     },
-    onPinchMove: function(evt) {
+    onPinchMove: function (evt) {
         let dX = evt.touches[0].clientX - evt.touches[1].clientX;
         let dY = evt.touches[0].clientY - evt.touches[1].clientY;
         let modelPivotEl = this.modelPivotEl;
@@ -327,14 +340,14 @@ AFRAME.registerComponent('model-viewer', {
         this.modelScale = modelScale;
         this.oldDistance = distance;
     },
-    onTouchEnd: function(evt) {
+    onTouchEnd: function (evt) {
         this.oldClientX = undefined;
         this.oldClientY = undefined;
         if (evt.touches.length < 2) {
             this.oldDistance = undefined;
         }
     },
-    onMouseUp: function(evt) {
+    onMouseUp: function (evt) {
         this.leftRightButtonPressed = false;
         if (evt.buttons === undefined || evt.buttons !== 0) {
             return;
@@ -342,14 +355,14 @@ AFRAME.registerComponent('model-viewer', {
         this.oldClientX = undefined;
         this.oldClientY = undefined;
     },
-    onMouseMove: function(evt) {
+    onMouseMove: function (evt) {
         if (this.leftRightButtonPressed) {
             this.dragModel(evt);
         } else {
             this.rotateModel(evt);
         }
     },
-    dragModel: function(evt) {
+    dragModel: function (evt) {
         let dX;
         let dY;
         let modelPivotEl = this.modelPivotEl;
@@ -363,7 +376,7 @@ AFRAME.registerComponent('model-viewer', {
         this.oldClientX = evt.clientX;
         this.oldClientY = evt.clientY;
     },
-    rotateModel: function(evt) {
+    rotateModel: function (evt) {
         let dX;
         let dY;
         let modelPivotEl = this.modelPivotEl;
@@ -378,10 +391,41 @@ AFRAME.registerComponent('model-viewer', {
         this.oldClientX = evt.clientX;
         this.oldClientY = evt.clientY;
     },
-    onModelLoaded: function() {
+    onModelLoaded: function () {
         this.centerAndScaleModel();
+
+        // const modelEl = this.modelEl;
+        // const modelMesh = modelEl.getObject3D('mesh');
+        // modelMesh.traverse((node) => {
+        //     if (node.isMesh) {
+        //         node.addEventListener('click', this.onModelClick.bind(this));
+        //     }
+        // });
+
+        const doorName1 = 'SM_front_door.001';
+        const doorName2 = 'SM_front_door.002';
+        const doorName3 = 'SM_BAck_dooor.001';
+        const doorName4 = 'SM_BAck_dooor.002';
+
+        
+
+        const doorMesh = this.findDoorMesh(doorName1);
+
+        if (doorMesh) {
+            doorMesh.rotation.set(0, -1, 0);
+           
+        }
     },
-    centerAndScaleModel: function() {
+    findDoorMesh: function ( doorName) {
+        const modelEl = this.modelEl;       
+
+        const isFound = modelEl.getObject3D('mesh').children.find(mesh => 
+             mesh.userData.name === doorName
+        );
+        return isFound
+    },
+
+    centerAndScaleModel: function () {
         let box;
         let size;
         let center;
@@ -391,7 +435,7 @@ AFRAME.registerComponent('model-viewer', {
         let titleEl = this.titleEl;
         let gltfObject = modelEl.getObject3D('mesh');
         modelEl.object3D.position.set(0, 0, 0);
-        modelEl.object3D.scale.set(0.2,0.2,0.2);
+        modelEl.object3D.scale.set(0.2, 0.2, 0.2);
         modelEl.object3D.rotation.set(0, 10, 0);
         this.cameraRigEl.object3D.position.z = 8.0;
         modelEl.object3D.updateMatrixWorld();
@@ -421,11 +465,17 @@ AFRAME.registerComponent('model-viewer', {
             this.cameraRigEl.object3D.position.z -= 1;
         }
     },
-    onMouseDown: function(evt) {
+    onMouseDown: function (evt) {              
         if (evt.buttons) {
             this.leftRightButtonPressed = evt.buttons === 3;
         }
         this.oldClientX = evt.clientX;
         this.oldClientY = evt.clientY;
-    }
-});
+
+    }}
+
+
+
+
+
+);

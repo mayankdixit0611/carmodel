@@ -63,4 +63,7 @@ AFRAME.registerComponent("animation-mixer", {
   tick: function (t, dt) {
     if (this.mixer && !isNaN(dt)) this.mixer.update(dt / 1000);
   },
+  
 });
+
+
