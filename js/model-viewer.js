@@ -264,7 +264,7 @@ AFRAME.registerComponent('model-viewer', {
         let modelPivotEl = this.modelPivotEl;
         let modelScale = this.modelScale || modelPivotEl.object3D.scale.x;
         modelScale -= evt.deltaY / 100;
-        modelScale = Math.min(Math.max(0.8, modelScale), 2.0);
+        modelScale = Math.min(Math.max(1, modelScale), 10.0);
         modelPivotEl.object3D.scale.set(modelScale, modelScale, modelScale);
         this.modelScale = modelScale;
     },
