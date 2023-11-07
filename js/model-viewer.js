@@ -24,10 +24,11 @@ AFRAME.registerComponent('model-viewer', {
             optionalFeatures: 'hit-test, local-floor, light-estimation, anchors'
         });
         this.isDoorOpen = false;
+        this.currentDoorAction = null;
         el.setAttribute('background', '');
-        const sphereEl = document.createElement('a-sphere');
-        sphereEl.setAttribute('radius', 1);
-        sphereEl.setAttribute('position', '8.267107887149905,0,-1.995886123040691');
+        const sphereEl = this.sphareEl =  document.createElement('a-sphere');
+        sphereEl.setAttribute('radius', 0.1);
+        sphereEl.setAttribute('position', '0, 1, -1.5');
         sphereEl.setAttribute('material', 'color: blue');
         sphereEl.classList.add('raycastable');
         this.modelEl = this.el.querySelector('#modelEl');
@@ -67,7 +68,6 @@ AFRAME.registerComponent('model-viewer', {
             }
             this.isDoorOpen = !this.isDoorOpen;
         });
-
         this.modelEl.appendChild(sphereEl);
         document.addEventListener('wheel', this.onMouseWheel);
         document.addEventListener('touchend', this.onTouchEnd);
@@ -80,45 +80,42 @@ AFRAME.registerComponent('model-viewer', {
 
     closeDoors: function () {
         const mixerComponent = modelEl.components['animation-mixer'];
-        console.log('close')
+        console.log('close');
 
         if (mixerComponent) {
-            const dooropening = mixerComponent.mixer.clipAction('All_door_closing');
-            console.log('closing:  ', dooropening)
-           
+            if (this.currentDoorAction) {
+                this.currentDoorAction.stop();
+            }
 
-    dooropening.play();
+            const doorClosingAction = mixerComponent.mixer.clipAction('All_door_closing');
+            doorClosingAction.setLoop(THREE.LoopOnce);
+            doorClosingAction.clampWhenFinished = true;
+            doorClosingAction.play();
 
-
-    dooropening.setLoop(THREE.LoopOnce); 
-    dooropening.clampWhenFinished = true; 
-            
+            this.currentDoorAction = doorClosingAction;
         } else {
-            console.error("Animation 'All_doors_opening' not found or 'animation-mixer' component is missing.");
+            console.error("Animation 'All_door_closing' not found or 'animation-mixer' component is missing.");
         }
-
     },
-    
 
     openDoors: function () {
-        const intersection = modelEl.getObject3D('mesh');
-        console.log('dash', intersection)
         const mixerComponent = modelEl.components['animation-mixer'];
 
         if (mixerComponent) {
-            const dooropening = mixerComponent.mixer.clipAction('All_doors_Opening');
-            console.log('open:  ', dooropening)
-            dooropening.play();
+            if (this.currentDoorAction) {
+                this.currentDoorAction.stop();
+            }
 
-
-            dooropening.setLoop(THREE.LoopOnce); 
-            dooropening.clampWhenFinished = true;          
-
+            const doorOpeningAction = mixerComponent.mixer.clipAction('All_doors_Opening');
+            doorOpeningAction.play();
+            doorOpeningAction.setLoop(THREE.LoopOnce);
+            doorOpeningAction.clampWhenFinished = true;
             
-        } else {
-            console.error("Animation 'All_doors_opening' not found or 'animation-mixer' component is missing.");
-        }
 
+            this.currentDoorAction = doorOpeningAction;
+        } else {
+            console.error("Animation 'All_door_opening' not found or 'animation-mixer' component is missing.");
+        }
     },
     
     
@@ -209,7 +206,7 @@ AFRAME.registerComponent('model-viewer', {
         laserHitPanelEl.setAttribute('visible', 'false');
         laserHitPanelEl.classList.add('raycastable');
         this.containerEl.appendChild(laserHitPanelEl);
-        modelEl.setAttribute('rotation', '0 -30 0');
+        modelEl.setAttribute('rotation', '0 -30 0');        
         modelEl.setAttribute('animation-mixer', 'clip: stop');
         modelEl.setAttribute('shadow', 'cast: true; receive: false');
         modelEl.setAttribute('id', 'modelEl');
