@@ -22,12 +22,12 @@ AFRAME.registerComponent('model-viewer', {
         });
         el.setAttribute('webxr', {
             optionalFeatures: 'hit-test, local-floor, light-estimation, anchors'
-        });        
+        });
         this.isDoorOpen = false;
         el.setAttribute('background', '');
         const sphereEl = document.createElement('a-sphere');
-        sphereEl.setAttribute('radius', 0.1);
-        sphereEl.setAttribute('position', '0 2 0'); 
+        sphereEl.setAttribute('radius', 1);
+        sphereEl.setAttribute('position', '8.267107887149905,0,-1.995886123040691');
         sphereEl.setAttribute('material', 'color: blue');
         sphereEl.classList.add('raycastable');
         this.modelEl = this.el.querySelector('#modelEl');
@@ -67,8 +67,8 @@ AFRAME.registerComponent('model-viewer', {
             }
             this.isDoorOpen = !this.isDoorOpen;
         });
-    
-        this.containerEl.appendChild(sphereEl);
+
+        this.modelEl.appendChild(sphereEl);
         document.addEventListener('wheel', this.onMouseWheel);
         document.addEventListener('touchend', this.onTouchEnd);
         document.addEventListener('touchmove', this.onTouchMove);
@@ -79,43 +79,49 @@ AFRAME.registerComponent('model-viewer', {
     },
 
     closeDoors: function () {
-        const modelEl = this.modelEl;
-        const modelMesh = modelEl.getObject3D('mesh');
-        const doorsToCheck = ['PU_L_Drivers_Door_JNT', 'PU_R_Drivers_Door_JNT', 'PU_L_Pass_Door_JNT', 'PU_R_Pass_Door_JNT'];
-        modelMesh.children.forEach(child => {
-            if (child.children[0] && child.children[0].children) {
-                child.children[0].children.forEach(door => {
-                    if (doorsToCheck.includes(door.name)) {
-                        door.rotation.set(0, 0, 0); 
-                    }
-                });
-            }
-        });
+        const mixerComponent = modelEl.components['animation-mixer'];
+        console.log('close')
+
+        if (mixerComponent) {
+            const dooropening = mixerComponent.mixer.clipAction('All_door_closing');
+            console.log('closing:  ', dooropening)
+           
+
+    dooropening.play();
+
+
+    dooropening.setLoop(THREE.LoopOnce); 
+    dooropening.clampWhenFinished = true; 
+            
+        } else {
+            console.error("Animation 'All_doors_opening' not found or 'animation-mixer' component is missing.");
+        }
+
     },
+    
 
     openDoors: function () {
-        const intersection = modelEl.getObject3D('mesh');        
+        const intersection = modelEl.getObject3D('mesh');
+        console.log('dash', intersection)
+        const mixerComponent = modelEl.components['animation-mixer'];
 
-        const doorsToCheck = ['PU_L_Drivers_Door_JNT', 'PU_R_Drivers_Door_JNT', 'PU_L_Pass_Door_JNT', 'PU_R_Pass_Door_JNT'];
-        intersection.children.forEach(child => {
-            if (child.children[0] && child.children[0].children) {
-                child.children[0].children.forEach(door => {
-                    if (doorsToCheck.includes(door.name)) {
-                        if (door.name === 'PU_L_Drivers_Door_JNT') {                            
-                            door.rotation.set(0, -1, 0);
-                        } else if (door.name === 'PU_R_Drivers_Door_JNT') {
-                            door.rotation.set(0, 1, 0);
-                        } else if (door.name === 'PU_L_Pass_Door_JNT') {
-                            door.rotation.set(0, 2, 0);
-                        } else if (door.name === 'PU_R_Pass_Door_JNT') {
-                            door.rotation.set(0, -2, 0);
-                        }
-                    }
-                });
-            }
-        });
+        if (mixerComponent) {
+            const dooropening = mixerComponent.mixer.clipAction('All_doors_Opening');
+            console.log('open:  ', dooropening)
+            dooropening.play();
+
+
+            dooropening.setLoop(THREE.LoopOnce); 
+            dooropening.clampWhenFinished = true;          
+
+            
+        } else {
+            console.error("Animation 'All_doors_opening' not found or 'animation-mixer' component is missing.");
+        }
 
     },
+    
+    
     update: function () {
 
         if (!this.data.gltfModel) {
@@ -268,7 +274,6 @@ AFRAME.registerComponent('model-viewer', {
     onMouseDownLaserHitPanel: function (evt) {
         let cursorEl = evt.detail.cursorEl;
         let intersection = cursorEl.components.raycaster.getIntersection(this.laserHitPanelEl);
-        console.log("inter:     ", intersection)
         if (!intersection) {
             return;
         }
@@ -428,6 +433,8 @@ AFRAME.registerComponent('model-viewer', {
     },
     onModelLoaded: function () {
         this.centerAndScaleModel();
+        const intersection = modelEl.getObject3D('mesh');
+        console.log('intersection:   ', intersection)
     },
     centerAndScaleModel: function () {
         let box;
@@ -438,10 +445,9 @@ AFRAME.registerComponent('model-viewer', {
         let shadowEl = this.shadowEl;
         let titleEl = this.titleEl;
         let gltfObject = modelEl.getObject3D('mesh');
-        let scaleValue= 0.02;
-        modelEl.object3D.position.set(scaleValue, scaleValue, scaleValue);
-        modelEl.object3D.scale.set(1, 1, 1);
-        modelEl.object3D.rotation.set(0, 11.5, 0);
+        modelEl.object3D.position.set(0, 0, 0);
+        modelEl.object3D.scale.set(0.3, 0.3, 0.3);
+        modelEl.object3D.rotation.set(0, 3.5, 0);
         this.cameraRigEl.object3D.position.z = 8.0;
         modelEl.object3D.updateMatrixWorld();
         box = new THREE.Box3().setFromObject(gltfObject);
@@ -485,3 +491,16 @@ AFRAME.registerComponent('model-viewer', {
 
 
 );
+
+
+function forEachChildRecursive(object, callback) {
+    // Perform the callback operation on the current object
+    callback(object);
+    // Check if the object has children
+    if (object.children) {
+      // Recursively iterate through each child
+      for (let i = 0; i < object.children.length; i++) {
+        forEachChildRecursive(object.children[i], callback);
+      }
+    }
+};
