@@ -22,11 +22,15 @@ AFRAME.registerComponent('model-viewer', {
         });
         el.setAttribute('webxr', {
             optionalFeatures: 'hit-test, local-floor, light-estimation, anchors'
-        });
+        });        
+        this.isDoorOpen = false;
         el.setAttribute('background', '');
+        const sphereEl = document.createElement('a-sphere');
+        sphereEl.setAttribute('radius', 0.1);
+        sphereEl.setAttribute('position', '0 2 0'); 
+        sphereEl.setAttribute('material', 'color: blue');
+        sphereEl.classList.add('raycastable');
         this.modelEl = this.el.querySelector('#modelEl');
-        this.modelInteractable = false;
-        this.activeHandEl = null;
         this.onModelLoaded = this.onModelLoaded.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
@@ -55,40 +59,65 @@ AFRAME.registerComponent('model-viewer', {
         document.addEventListener('mouseup', this.onMouseUp);
         document.addEventListener('mousemove', this.onMouseMove);
         document.addEventListener('mousedown', this.onMouseDown);
+        sphereEl.addEventListener('click', () => {
+            if (this.isDoorOpen) {
+                this.closeDoors();
+            } else {
+                this.openDoors();
+            }
+            this.isDoorOpen = !this.isDoorOpen;
+        });
+    
+        this.containerEl.appendChild(sphereEl);
         document.addEventListener('wheel', this.onMouseWheel);
         document.addEventListener('touchend', this.onTouchEnd);
         document.addEventListener('touchmove', this.onTouchMove);
         this.el.sceneEl.addEventListener('enter-vr', this.onEnterVR);
         this.el.sceneEl.addEventListener('exit-vr', this.onExitVR);
-        // this.modelEl.addEventListener('click', this.onModelClick);
         this.modelEl.addEventListener('model-loaded', this.onModelLoaded);
-        this.containerEl.addEventListener('click', this.onModelClick);
 
     },
 
-    onModelClick: function (evt) {
-        console.log('gggggggthis');
-        const raycasterEl = document.querySelector('[raycaster]');
-        const intersections = raycasterEl.components.raycaster.intersections;
-        if (intersections.length > 0) {
-            const modelEl = document.querySelector('#modelEl');
-            const doorName1 = 'PU_Rear_Door';
-            const doorMesh = modelEl.getObject3D('mesh').children.find(mesh =>
-                mesh.userData.name === doorName1
-            );
-            if (doorMesh) {
-                doorMesh.rotation.set(0, 1, 0);
+    closeDoors: function () {
+        const modelEl = this.modelEl;
+        const modelMesh = modelEl.getObject3D('mesh');
+        const doorsToCheck = ['PU_L_Drivers_Door_JNT', 'PU_R_Drivers_Door_JNT', 'PU_L_Pass_Door_JNT', 'PU_R_Pass_Door_JNT'];
+        modelMesh.children.forEach(child => {
+            if (child.children[0] && child.children[0].children) {
+                child.children[0].children.forEach(door => {
+                    if (doorsToCheck.includes(door.name)) {
+                        door.rotation.set(0, 0, 0); 
+                    }
+                });
             }
-
-            // if (clickedObject.getAttribute('class') === 'clickable') {
-            //     const clickedMeshId = clickedObject.getAttribute('mesh-id');
-            //     console.log('Clicked Mesh ID: ' + clickedMeshId);
-            // }
-        }
+        });
     },
 
+    openDoors: function () {
+        const intersection = modelEl.getObject3D('mesh');        
 
+        const doorsToCheck = ['PU_L_Drivers_Door_JNT', 'PU_R_Drivers_Door_JNT', 'PU_L_Pass_Door_JNT', 'PU_R_Pass_Door_JNT'];
+        intersection.children.forEach(child => {
+            if (child.children[0] && child.children[0].children) {
+                child.children[0].children.forEach(door => {
+                    if (doorsToCheck.includes(door.name)) {
+                        if (door.name === 'PU_L_Drivers_Door_JNT') {                            
+                            door.rotation.set(0, -1, 0);
+                        } else if (door.name === 'PU_R_Drivers_Door_JNT') {
+                            door.rotation.set(0, 1, 0);
+                        } else if (door.name === 'PU_L_Pass_Door_JNT') {
+                            door.rotation.set(0, 2, 0);
+                        } else if (door.name === 'PU_R_Pass_Door_JNT') {
+                            door.rotation.set(0, -2, 0);
+                        }
+                    }
+                });
+            }
+        });
+
+    },
     update: function () {
+
         if (!this.data.gltfModel) {
             return;
         }
@@ -150,7 +179,6 @@ AFRAME.registerComponent('model-viewer', {
         });
         backgroundEl.setAttribute('hide-on-enter-ar', '');
     },
-
     initEntities: function () {
         let containerEl = this.containerEl = document.createElement('a-entity');
         let laserHitPanelEl = this.laserHitPanelEl = document.createElement('a-entity');
@@ -176,7 +204,7 @@ AFRAME.registerComponent('model-viewer', {
         laserHitPanelEl.classList.add('raycastable');
         this.containerEl.appendChild(laserHitPanelEl);
         modelEl.setAttribute('rotation', '0 -30 0');
-        modelEl.setAttribute('animation-mixer', '');
+        modelEl.setAttribute('animation-mixer', 'clip: stop');
         modelEl.setAttribute('shadow', 'cast: true; receive: false');
         modelEl.setAttribute('id', 'modelEl');
         modelPivotEl.appendChild(modelEl);
@@ -216,9 +244,10 @@ AFRAME.registerComponent('model-viewer', {
             intensity: 0.5,
             target: 'modelPivot'
         });
+        this.el.appendChild(containerEl);
         this.containerEl.appendChild(lightEl);
         this.containerEl.appendChild(modelPivotEl);
-        this.el.appendChild(containerEl);
+
     },
     onThumbstickMoved: function (evt) {
         let modelPivotEl = this.modelPivotEl;
@@ -239,6 +268,7 @@ AFRAME.registerComponent('model-viewer', {
     onMouseDownLaserHitPanel: function (evt) {
         let cursorEl = evt.detail.cursorEl;
         let intersection = cursorEl.components.raycaster.getIntersection(this.laserHitPanelEl);
+        console.log("inter:     ", intersection)
         if (!intersection) {
             return;
         }
@@ -398,38 +428,7 @@ AFRAME.registerComponent('model-viewer', {
     },
     onModelLoaded: function () {
         this.centerAndScaleModel();
-
-        // const modelEl = this.modelEl;
-        // const modelMesh = modelEl.getObject3D('mesh');
-        // modelMesh.traverse((node) => {
-        //     if (node.isMesh) {
-        //         node.addEventListener('click', this.onModelClick.bind(this));
-        //     }
-        // });
-
-        // const doorName1 = 'SM_front_door.001';
-        // const doorName2 = 'SM_front_door.002';
-        // const doorName3 = 'SM_BAck_dooor.001';
-        // const doorName4 = 'SM_BAck_dooor.002';
-
-
-
-        // const doorMesh = this.findDoorMesh(doorName1);
-
-        // if (doorMesh) {
-        //     debugger;
-        //     doorMesh.rotation.set(0, -1, 0);
-        // }
     },
-    findDoorMesh: function (doorName) {
-        const modelEl = this.modelEl;
-
-        const isFound = modelEl.getObject3D('mesh').children.find(mesh =>
-            mesh.userData.name === doorName
-        );
-        return isFound;
-    },
-
     centerAndScaleModel: function () {
         let box;
         let size;
@@ -439,9 +438,10 @@ AFRAME.registerComponent('model-viewer', {
         let shadowEl = this.shadowEl;
         let titleEl = this.titleEl;
         let gltfObject = modelEl.getObject3D('mesh');
-        modelEl.object3D.position.set(0, 0, 0);
-        modelEl.object3D.scale.set(0.2, 0.2, 0.2);
-        modelEl.object3D.rotation.set(0, 10, 0);
+        let scaleValue= 0.02;
+        modelEl.object3D.position.set(scaleValue, scaleValue, scaleValue);
+        modelEl.object3D.scale.set(1, 1, 1);
+        modelEl.object3D.rotation.set(0, 11.5, 0);
         this.cameraRigEl.object3D.position.z = 8.0;
         modelEl.object3D.updateMatrixWorld();
         box = new THREE.Box3().setFromObject(gltfObject);
