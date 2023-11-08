@@ -26,11 +26,19 @@ AFRAME.registerComponent('model-viewer', {
         this.isDoorOpen = false;
         this.currentDoorAction = null;
         el.setAttribute('background', '');
-        const sphereEl = this.sphareEl =  document.createElement('a-sphere');
-        sphereEl.setAttribute('radius', 0.1);
-        sphereEl.setAttribute('position', '0, 1, -1.5');
-        sphereEl.setAttribute('material', 'color: blue');
-        sphereEl.classList.add('raycastable');
+        const doorclickEl = this.doorclickEl =  document.createElement('a-sphere');
+        doorclickEl.setAttribute('radius', 0.1);
+        doorclickEl.setAttribute('position', '0, 1, -1.0');
+        doorclickEl.setAttribute('material', 'color: green');
+        doorclickEl.setAttribute('id', 'doorclick');
+        doorclickEl.classList.add('raycastable');
+
+        const headclickEl = this.headclickEl =  document.createElement('a-sphere');
+        headclickEl.setAttribute('radius', 0.1);
+        headclickEl.setAttribute('position', '2.7, 1.2, -1.0');
+        headclickEl.setAttribute('material', 'color: green');
+        headclickEl.setAttribute('id', 'doorclick');
+        headclickEl.classList.add('raycastable');
         this.modelEl = this.el.querySelector('#modelEl');
         this.onModelLoaded = this.onModelLoaded.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
@@ -60,7 +68,7 @@ AFRAME.registerComponent('model-viewer', {
         document.addEventListener('mouseup', this.onMouseUp);
         document.addEventListener('mousemove', this.onMouseMove);
         document.addEventListener('mousedown', this.onMouseDown);
-        sphereEl.addEventListener('click', () => {
+        doorclickEl.addEventListener('click', () => {
             if (this.isDoorOpen) {
                 this.closeDoors();
             } else {
@@ -68,7 +76,22 @@ AFRAME.registerComponent('model-viewer', {
             }
             this.isDoorOpen = !this.isDoorOpen;
         });
-        this.modelEl.appendChild(sphereEl);
+        headclickEl.addEventListener('click', () => {
+            const modelEl = this.modelEl;
+            const fromRotation = modelEl.getAttribute('rotation');
+            const rotationsValue = fromRotation.y + 60
+            const toRotation = `0 ${rotationsValue} 0`;
+            const animationDuration = 1000;
+
+            modelEl.setAttribute('animation__rotate', {
+                property: 'rotation',
+                to: toRotation,
+                dur: animationDuration,
+                easing: 'easeInOutQuad'
+            });
+        });
+        this.modelEl.appendChild(doorclickEl);
+        // this.modelEl.appendChild(headclickEl);
         document.addEventListener('wheel', this.onMouseWheel);
         document.addEventListener('touchend', this.onTouchEnd);
         document.addEventListener('touchmove', this.onTouchMove);
@@ -172,15 +195,17 @@ AFRAME.registerComponent('model-viewer', {
         let backgroundEl = this.backgroundEl = document.querySelector('a-entity');
         backgroundEl.setAttribute('geometry', {
             primitive: 'sphere',
-            radius: 65
+            radius: 9
         });
         backgroundEl.setAttribute('material', {
-            shader: 'background-gradient',
-            colorTop: '#37383c',
-            colorBottom: '#757575',
-            side: 'back'
+            shader: 'flat',
+            // colorTop: '#37383c',
+            // colorBottom: '#757575',
+            src:'./images/sky.jpg',
+            side: 'double',
+            mipMap: false
         });
-        backgroundEl.setAttribute('hide-on-enter-ar', '');
+        //backgroundEl.setAttribute('hide-on-enter-ar', '');
     },
     initEntities: function () {
         let containerEl = this.containerEl = document.createElement('a-entity');
@@ -234,7 +259,7 @@ AFRAME.registerComponent('model-viewer', {
         titleEl.setAttribute('visible', 'false');
         this.containerEl.appendChild(titleEl);
         lightEl.id = 'light';
-        lightEl.setAttribute('position', '-2 4 2');
+        lightEl.setAttribute('position', '2.970 4 -1');
         lightEl.setAttribute('light', {
             type: 'directional',
             castShadow: true,
