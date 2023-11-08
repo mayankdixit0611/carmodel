@@ -32,7 +32,11 @@ AFRAME.registerComponent('model-viewer', {
         doorclickEl.setAttribute('material', 'color: green');
         doorclickEl.setAttribute('id', 'doorclick');
         doorclickEl.classList.add('raycastable');
-
+        const inteSphereEl = this.inteSphereEl =  document.createElement('a-sphere');
+        inteSphereEl.setAttribute('radius', 0.1);
+        inteSphereEl.setAttribute('position', '0, 2, 0');
+        inteSphereEl.setAttribute('material', 'color: blue');
+        inteSphereEl.classList.add('raycastable');
         const headclickEl = this.headclickEl =  document.createElement('a-sphere');
         headclickEl.setAttribute('radius', 0.1);
         headclickEl.setAttribute('position', '2.7, 1.2, -1.0');
@@ -90,8 +94,13 @@ AFRAME.registerComponent('model-viewer', {
                 easing: 'easeInOutQuad'
             });
         });
+        inteSphereEl.addEventListener('click', () => {            
+            console.log('test');
+            this.goInterior();
+        });
         this.modelEl.appendChild(doorclickEl);
-        // this.modelEl.appendChild(headclickEl);
+        this.modelEl.appendChild(inteSphereEl);
+        this.modelEl.appendChild(headclickEl);
         document.addEventListener('wheel', this.onMouseWheel);
         document.addEventListener('touchend', this.onTouchEnd);
         document.addEventListener('touchmove', this.onTouchMove);
@@ -100,6 +109,38 @@ AFRAME.registerComponent('model-viewer', {
         this.modelEl.addEventListener('model-loaded', this.onModelLoaded);
 
     },
+
+    goInterior: function () {
+        const openDoorsAndMoveCamera = () => {
+            this.openDoors();
+    
+            setTimeout(() => {
+                let cameraRigEl = this.cameraRigEl;
+                const animationDuration = 1000;
+                const interiorPosition = { x: 0, y: 0.5, z: 0 };
+    
+                cameraRigEl.setAttribute('animation__position', {
+                    property: 'position',
+                    to: interiorPosition,
+                    dur: animationDuration,
+                    easing: 'easeInOutQuad'
+                });
+    
+                setTimeout(() => {
+                    cameraRigEl.setAttribute('animation__rotation', {
+                        property: 'rotation',
+                        to: '0 96 0', 
+                        dur: animationDuration,
+                        easing: 'easeInOutQuad'
+                    });
+                }, 1000); 
+            }, 2000); 
+        };
+    
+        openDoorsAndMoveCamera();
+    },
+
+    
 
     closeDoors: function () {
         const mixerComponent = modelEl.components['animation-mixer'];
@@ -420,7 +461,8 @@ AFRAME.registerComponent('model-viewer', {
     onMouseMove: function (evt) {
         if (this.leftRightButtonPressed) {
             this.dragModel(evt);
-        } else {
+        } 
+        else {
             this.rotateModel(evt);
         }
     },
@@ -440,7 +482,7 @@ AFRAME.registerComponent('model-viewer', {
     },
     rotateModel: function (evt) {
         let dX;
-        let dY;
+        let dY; // used for model rotation up and down
         let modelPivotEl = this.modelPivotEl;
         if (!this.oldClientX) {
             return;
@@ -448,15 +490,13 @@ AFRAME.registerComponent('model-viewer', {
         dX = this.oldClientX - evt.clientX;
         dY = this.oldClientY - evt.clientY;
         modelPivotEl.object3D.rotation.y -= dX / 100;
-        modelPivotEl.object3D.rotation.x -= dY / 200;
+        modelPivotEl.object3D.rotation.x -= dY / 200;   
         modelPivotEl.object3D.rotation.x = Math.min(Math.max(-Math.PI / 2, modelPivotEl.object3D.rotation.x), Math.PI / 2);
         this.oldClientX = evt.clientX;
         this.oldClientY = evt.clientY;
     },
     onModelLoaded: function () {
         this.centerAndScaleModel();
-        const intersection = modelEl.getObject3D('mesh');
-        console.log('intersection:   ', intersection)
     },
     centerAndScaleModel: function () {
         let box;
