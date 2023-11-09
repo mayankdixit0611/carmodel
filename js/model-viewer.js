@@ -171,7 +171,7 @@ AFRAME.registerComponent('model-viewer', {
                 this.currentDoorAction.stop();
             }
 
-            const doorClosingAction = mixerComponent.mixer.clipAction('All_door_closing');
+            const doorClosingAction = mixerComponent.mixer.clipAction('All_doors_closing');
             doorClosingAction.setLoop(THREE.LoopOnce);
             doorClosingAction.clampWhenFinished = true;
             doorClosingAction.play();
@@ -190,7 +190,7 @@ AFRAME.registerComponent('model-viewer', {
                 this.currentDoorAction.stop();
             }
 
-            const doorOpeningAction = mixerComponent.mixer.clipAction('All_doors_Opening');
+            const doorOpeningAction = mixerComponent.mixer.clipAction('All_doors_opening');
             doorOpeningAction.play();
             doorOpeningAction.setLoop(THREE.LoopOnce);
             doorOpeningAction.clampWhenFinished = true;
