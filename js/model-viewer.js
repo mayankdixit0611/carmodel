@@ -26,18 +26,18 @@ AFRAME.registerComponent('model-viewer', {
         this.isDoorOpen = false;
         this.currentDoorAction = null;
         el.setAttribute('background', '');
-        const doorclickEl = this.doorclickEl =  document.createElement('a-sphere');
+        const doorclickEl = this.doorclickEl = document.createElement('a-sphere');
         doorclickEl.setAttribute('radius', 0.1);
         doorclickEl.setAttribute('position', '0, 1, -1.0');
         doorclickEl.setAttribute('material', 'color: green');
         doorclickEl.setAttribute('id', 'doorclick');
         doorclickEl.classList.add('raycastable');
-        const inteSphereEl = this.inteSphereEl =  document.createElement('a-sphere');
+        const inteSphereEl = this.inteSphereEl = document.createElement('a-sphere');
         inteSphereEl.setAttribute('radius', 0.1);
         inteSphereEl.setAttribute('position', '0, 2, 0');
         inteSphereEl.setAttribute('material', 'color: blue');
         inteSphereEl.classList.add('raycastable');
-        const headclickEl = this.headclickEl =  document.createElement('a-sphere');
+        const headclickEl = this.headclickEl = document.createElement('a-sphere');
         headclickEl.setAttribute('radius', 0.1);
         headclickEl.setAttribute('position', '2.7, 1.2, -1.0');
         headclickEl.setAttribute('material', 'color: green');
@@ -82,19 +82,39 @@ AFRAME.registerComponent('model-viewer', {
         });
         headclickEl.addEventListener('click', () => {
             const modelEl = this.modelEl;
-            const fromRotation = modelEl.getAttribute('rotation');
-            const rotationsValue = fromRotation.y + 60
-            const toRotation = `0 ${rotationsValue} 0`;
-            const animationDuration = 1000;
+            // const fromRotation = modelEl.getAttribute('rotation');
+            // const rotationsValue = fromRotation.y + 60;
+            // const toRotation = `0 ${rotationsValue} 0`;
+            // const animationDuration = 1000;
 
-            modelEl.setAttribute('animation__rotate', {
-                property: 'rotation',
-                to: toRotation,
-                dur: animationDuration,
-                easing: 'easeInOutQuad'
-            });
+            // modelEl.setAttribute('animation__rotate', {
+            //     property: 'rotation',
+            //     to: toRotation,
+            //     dur: animationDuration,
+            //     easing: 'easeInOutQuad'
+            // });
+            const headlightEl = document.createElement('a-light');
+            headlightEl.setAttribute('id', 'headlight');
+            headlightEl.setAttribute('type', 'spot');
+            headlightEl.setAttribute('color', '#efefef');
+            headlightEl.setAttribute('position', '7 -2 8');
+            headlightEl.setAttribute('intensity', '15');
+            headlightEl.setAttribute('distance', '20');
+            // headlightEl.setAttribute('rotation', '0 0 -180');
+
+            // headlightEl.setAttribute('angle', '-180');s
+            // headlightEl.setAttribute('target', '10 20');
+            // headlightEl.setAttribute('penumbra', '1');
+            // headlightEl.setAttribute('decay', '1');
+            // headlightEl.setAttribute('target', '#chandan-camera');
+            this.modelEl.appendChild(headlightEl);
+            console.log(this.cameraEl);
+            const camera = document.querySelector('a-camera');
+            const camera2 = document.getElementsByClassName('a-camera');
+            console.log(camera);
+            console.log(camera2);
         });
-        inteSphereEl.addEventListener('click', () => {            
+        inteSphereEl.addEventListener('click', () => {
             console.log('test');
             this.goInterior();
         });
@@ -113,34 +133,34 @@ AFRAME.registerComponent('model-viewer', {
     goInterior: function () {
         const openDoorsAndMoveCamera = () => {
             this.openDoors();
-    
+
             setTimeout(() => {
                 let cameraRigEl = this.cameraRigEl;
                 const animationDuration = 1000;
                 const interiorPosition = { x: 0, y: 0.5, z: 0 };
-    
+
                 cameraRigEl.setAttribute('animation__position', {
                     property: 'position',
                     to: interiorPosition,
                     dur: animationDuration,
                     easing: 'easeInOutQuad'
                 });
-    
+
                 setTimeout(() => {
                     cameraRigEl.setAttribute('animation__rotation', {
                         property: 'rotation',
-                        to: '0 96 0', 
+                        to: '0 96 0',
                         dur: animationDuration,
                         easing: 'easeInOutQuad'
                     });
-                }, 1000); 
-            }, 2000); 
+                }, 1000);
+            }, 2000);
         };
-    
+
         openDoorsAndMoveCamera();
     },
 
-    
+
 
     closeDoors: function () {
         const mixerComponent = modelEl.components['animation-mixer'];
@@ -174,15 +194,15 @@ AFRAME.registerComponent('model-viewer', {
             doorOpeningAction.play();
             doorOpeningAction.setLoop(THREE.LoopOnce);
             doorOpeningAction.clampWhenFinished = true;
-            
+
 
             this.currentDoorAction = doorOpeningAction;
         } else {
             console.error("Animation 'All_door_opening' not found or 'animation-mixer' component is missing.");
         }
     },
-    
-    
+
+
     update: function () {
 
         if (!this.data.gltfModel) {
@@ -197,6 +217,7 @@ AFRAME.registerComponent('model-viewer', {
     initCameraRig: function () {
         let cameraRigEl = this.cameraRigEl = document.createElement('a-entity');
         let cameraEl = this.cameraEl = document.createElement('a-entity');
+        cameraEl.setAttribute('class', 'chandan-camera');
         let rightHandEl = this.rightHandEl = document.createElement('a-entity');
         let leftHandEl = this.leftHandEl = document.createElement('a-entity');
         cameraEl.setAttribute('camera', {
@@ -242,7 +263,7 @@ AFRAME.registerComponent('model-viewer', {
             shader: 'flat',
             // colorTop: '#37383c',
             // colorBottom: '#757575',
-            src:'./images/sky.jpg',
+            src: './images/sky.jpg',
             side: 'double',
             mipMap: false
         });
@@ -272,7 +293,7 @@ AFRAME.registerComponent('model-viewer', {
         laserHitPanelEl.setAttribute('visible', 'false');
         laserHitPanelEl.classList.add('raycastable');
         this.containerEl.appendChild(laserHitPanelEl);
-        modelEl.setAttribute('rotation', '0 -30 0');        
+        modelEl.setAttribute('rotation', '0 -30 0');
         modelEl.setAttribute('animation-mixer', 'clip: stop');
         modelEl.setAttribute('shadow', 'cast: true; receive: false');
         modelEl.setAttribute('id', 'modelEl');
@@ -461,7 +482,7 @@ AFRAME.registerComponent('model-viewer', {
     onMouseMove: function (evt) {
         if (this.leftRightButtonPressed) {
             this.dragModel(evt);
-        } 
+        }
         else {
             this.rotateModel(evt);
         }
@@ -490,13 +511,15 @@ AFRAME.registerComponent('model-viewer', {
         dX = this.oldClientX - evt.clientX;
         dY = this.oldClientY - evt.clientY;
         modelPivotEl.object3D.rotation.y -= dX / 100;
-        modelPivotEl.object3D.rotation.x -= dY / 200;   
+        modelPivotEl.object3D.rotation.x -= dY / 200;
         modelPivotEl.object3D.rotation.x = Math.min(Math.max(-Math.PI / 2, modelPivotEl.object3D.rotation.x), Math.PI / 2);
         this.oldClientX = evt.clientX;
         this.oldClientY = evt.clientY;
     },
     onModelLoaded: function () {
         this.centerAndScaleModel();
+        const intersection = modelEl.getObject3D('mesh');
+        console.log('intersection:   ', intersection);
     },
     centerAndScaleModel: function () {
         let box;
@@ -560,9 +583,9 @@ function forEachChildRecursive(object, callback) {
     callback(object);
     // Check if the object has children
     if (object.children) {
-      // Recursively iterate through each child
-      for (let i = 0; i < object.children.length; i++) {
-        forEachChildRecursive(object.children[i], callback);
-      }
+        // Recursively iterate through each child
+        for (let i = 0; i < object.children.length; i++) {
+            forEachChildRecursive(object.children[i], callback);
+        }
     }
 };
