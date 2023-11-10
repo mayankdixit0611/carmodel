@@ -81,39 +81,29 @@ AFRAME.registerComponent('model-viewer', {
             this.isDoorOpen = !this.isDoorOpen;
         });
         headclickEl.addEventListener('click', () => {
-            const modelEl = this.modelEl;
-            // const fromRotation = modelEl.getAttribute('rotation');
-            // const rotationsValue = fromRotation.y + 60;
-            // const toRotation = `0 ${rotationsValue} 0`;
-            // const animationDuration = 1000;
-
-            // modelEl.setAttribute('animation__rotate', {
-            //     property: 'rotation',
-            //     to: toRotation,
-            //     dur: animationDuration,
-            //     easing: 'easeInOutQuad'
-            // });
-            const headlightEl = document.createElement('a-light');
-            headlightEl.setAttribute('id', 'headlight');
-            headlightEl.setAttribute('type', 'spot');
-            headlightEl.setAttribute('color', '#efefef');
-            headlightEl.setAttribute('position', '7 -2 8');
-            headlightEl.setAttribute('intensity', '15');
-            headlightEl.setAttribute('distance', '20');
-            // headlightEl.setAttribute('rotation', '0 0 -180');
-
-            // headlightEl.setAttribute('angle', '-180');s
-            // headlightEl.setAttribute('target', '10 20');
-            // headlightEl.setAttribute('penumbra', '1');
-            // headlightEl.setAttribute('decay', '1');
-            // headlightEl.setAttribute('target', '#chandan-camera');
-            this.modelEl.appendChild(headlightEl);
-            console.log(this.cameraEl);
-            const camera = document.querySelector('a-camera');
-            const camera2 = document.getElementsByClassName('a-camera');
-            console.log(camera);
-            console.log(camera2);
+            this.modelEl.getObject3D('mesh');
+            forEachChildRecursive(this.modelEl.getObject3D('mesh'), (child) => {
+                if (child.name === 'SM_Front_Light') {
+                    console.log(child);
+                    const col = new THREE.Color(1, 1, 0);
+                    console.log(col);
+                    child.material.color = col;
+                    child.material.needsUpdate = true;
+            //         // child.material.color.set(col);
+                    console.log(child);
+                }
+            });
         });
+        // headclickEl.addEventListener('click', () => {
+        //     console.log('hello');
+        //     console.log(this.modelEl.getObject3D('mesh'));
+        //     console.log(child.name);
+        //     forEachChildRecursive(this.modelEl.getObject3D('mesh'), (child) => {
+        //         if (child.name === 'SM_Front_Light') {
+        //             // child.material.color = new THREE.Color('#ff0000'); // red
+        //         }
+        //     });
+        // });
         inteSphereEl.addEventListener('click', () => {
             console.log('test');
             this.goInterior();
